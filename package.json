@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node server.mjs",
+    "start": "node start.mjs",
     "update-corp-codes": "tsx scripts/update-corp-codes.ts",
     "dev:connector": "node server.mjs"
   },
