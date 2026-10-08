@@ -18,7 +18,9 @@ export function getSessionApiKey(): string | undefined {
 }
 
 export function resolveApiKey(toolParamKey?: string): string {
-  const key = toolParamKey || sessionApiKey || process.env.OPENDART_API_KEY;
+  const key = process.env.CONNECTOR_LOGIN_PASSWORD
+    ? process.env.OPENDART_API_KEY
+    : toolParamKey || sessionApiKey || process.env.OPENDART_API_KEY;
   if (!key) {
     throw new Error(
       "[OpenDART] API key required. Get one at https://opendart.fss.or.kr/ and call set_api_key tool first. / " +

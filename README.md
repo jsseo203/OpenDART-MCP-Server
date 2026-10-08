@@ -8,7 +8,7 @@ API를 발급받아 Claude 커스텀 커넥터로 바로 연결할 수 있습니
 
 - **Open DART API 전부 지원**: Open DART에서 제공하는 API(83개)를 전부 지원합니다.
 - **Vercel 배포**: ngrok/터널링 없이 커스텀 커넥터로 바로 연결 가능합니다.
-- **URL 기반 API 키**: 커넥터 URL에 키를 포함하여 설정 없이 즉시 사용 가능합니다.
+- **개인용 OAuth 인증**: 서버 비밀 설정에 DART 키를 저장하고 인증된 커넥터만 조회합니다.
 - **마크다운 출력**: Claude에서 깔끔하게 렌더링되는 테이블 형태로 출력합니다.
 - **Corp Code 캐싱**: 9만+ 기업 목록을 인메모리 캐싱 (24시간 TTL)
 
@@ -18,12 +18,9 @@ API를 발급받아 Claude 커스텀 커넥터로 바로 연결할 수 있습니
 
 [OpenDART](https://opendart.fss.or.kr/)에서 회원가입 후 API 인증키를 발급받으세요.
 
-### 2. Claude에 연결
+### 2. 개인용 ChatGPT 커넥터 배포
 
-1. [claude.ai](https://claude.ai) 접속
-2. 사용자 지정 > 커넥터 > 사용자 지정 커넥터 추가
-3. URL 입력: `https://your-project.vercel.app/api/mcp?opendart_key=YOUR_API_KEY`
-4. 연결 완료! 별도 설정 없이 바로 사용 가능
+이 저장소의 개인용 배포는 Render에서 실행합니다. MCP 주소는 서버의 `/api/mcp`이며 OAuth 인증이 필수입니다. DART 키는 `OPENDART_API_KEY` 비밀 설정에 보관하고 URL에 넣지 않습니다. 자세한 실행 설정은 아래 Private ChatGPT deployment를 참고하세요.
 
 ## Tools
 
@@ -116,3 +113,15 @@ Claude에서 다음과 같이 사용하세요:
 ## License
 
 MIT
+
+## Private ChatGPT deployment (Render)
+
+The private deployment uses `/api/mcp` with OAuth Authorization Code + PKCE, a pre-registered public client `opendart-chatgpt`, and server-side `OPENDART_API_KEY`. DART keys in URLs and session key changes are disabled.
+
+Runtime: Node 24; build: `npm ci && npm run build`; start: `npm start`. Health endpoint: `/health`.
+
+Required secrets: `OPENDART_API_KEY`, `CONNECTOR_LOGIN_PASSWORD`, `OAUTH_COOKIE_SECRET`, and `OAUTH_JWKS` (RSA signing JWK set). Configure optional `CONNECTOR_PUBLIC_URL` when not using Render's external URL.
+
+OAuth state is encrypted in SQLite. Set `OAUTH_STORE_PATH` to a persistent-disk path for durable refresh tokens and login sessions. The default `/tmp/opendart-oauth/state.sqlite` works for initial verification but does not survive Render container replacement. Render Free services may sleep; fully always-on operation requires an appropriate paid service and persistent storage.
+
+Only register this as a personal connector. Its single owner login grants access to public DART data using the owner's API quota. Login password and signing/cookie secrets must stay in Render's secret settings, never in Git or the MCP URL.

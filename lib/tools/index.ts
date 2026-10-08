@@ -10,7 +10,7 @@ import { registerSecuritiesRegTools } from "./securities-reg";
 import { registerWorkflowTools } from "./workflows";
 
 function registerConfigTools(server: McpServer) {
-  server.tool(
+  if (!process.env.CONNECTOR_LOGIN_PASSWORD) server.tool(
     "set_api_key",
     "Set your OpenDART API key for this session. Get one free at https://opendart.fss.or.kr/ — once set, all tools will use it automatically. / OpenDART API 키를 설정합니다. https://opendart.fss.or.kr/ 에서 무료 발급 후 입력하세요.",
     { api_key: z.string().describe("Your OpenDART API key / OpenDART API 인증키") },
