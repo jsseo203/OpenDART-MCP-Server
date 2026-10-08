@@ -62,7 +62,7 @@ app.get('/oauth/interaction/:uid', async (req, res, nextFn) => {
       for (const [resource, scopes] of Object.entries(missing.missingResourceScopes || {})) grant.addResourceScope(resource, scopes.join(' '));
       return oidc.interactionFinished(req, res, { consent: { grantId: await grant.save() } }, { mergeWithLastSubmission: true });
     }
-    res.set({ 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'", 'Referrer-Policy': 'no-referrer' });
+    res.set({ 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'", 'Referrer-Policy': 'same-origin' });
     res.type('html').send(html(details.uid));
   } catch (e) { nextFn(e); }
 });
